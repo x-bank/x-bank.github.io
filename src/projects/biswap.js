@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { usePrepareContractWrite, useContractWrite, useProvider, useSigner } from 'wagmi'
 import { PrimaryButton, CommandBarButton } from "@fluentui/react";
+import {useCustomContractWrite} from "../connectors"
 
 const chefAbi = [
     "function userInfo(uint256, address) view returns (uint256, uint256)",
@@ -47,7 +47,6 @@ const check = async (address) => {
 }
 
 export function BiswapCard({ address }) {
-    const provider = useProvider();
     let [assets, setAssets] = useState([]);
     useEffect(() => {
         if (address.length === "") {
@@ -61,31 +60,12 @@ export function BiswapCard({ address }) {
         run();
     }, [address])
 
-    useEffect(() => {
-        console.log(provider);
-        console.log(provider.chainId);
-    }, [provider])
-
-    let [harvestPoolId, setHarvestPoolId] = useState(-1)
-
-    const { config } = usePrepareContractWrite({
+    let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
         functionName: "deposit",
         chainId: chainId,
-        args: [harvestPoolId, 0],
-        enabled: harvestPoolId >= 0
     })
-    const { write } = useContractWrite(config)
-
-    useEffect(() => {
-        if (harvestPoolId >= 0 && write) {
-            write();
-        }
-        return () => {
-            setHarvestPoolId(-2);
-        }
-    }, [harvestPoolId])
 
     return <div>
         <div className="flex font-semibold mb-2 bg-slate-200 py-1">
@@ -103,7 +83,7 @@ export function BiswapCard({ address }) {
                         <div className="flex items-center">
                             <div>{asset[5]} BSW ({asset[6]}USD)</div>
                             <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
-                                onClick={() => { setHarvestPoolId(asset[0]) }}
+                                onClick={() => { harvest([asset[0], 0]) }}
                             ></PrimaryButton>
                         </div>
                     </div>
