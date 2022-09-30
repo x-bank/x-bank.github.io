@@ -25,7 +25,6 @@ function shortAddr(addr) {
 export function useCustomContractWrite(params) {
     let [args, execute] = useState(null);
 
-
     const { config } = usePrepareContractWrite({
         ...params,
         args: args,
@@ -36,6 +35,7 @@ export function useCustomContractWrite(params) {
     const { chain } = useNetwork()
 
     const { switchNetwork } = useSwitchNetwork({
+        throwForSwitchChainNotSupported: true,
         onSuccess(data) {
             if (write && data.id === params.chainId) {
                 write();
@@ -44,9 +44,9 @@ export function useCustomContractWrite(params) {
     })
 
     useEffect(() => {
-        if (args !== null) {
+        if (args !== null && chain.id) {
             if (chain.id !== params.chainId) {
-                switchNetwork(params.chainId);
+                switchNetwork(params.chainId)
             } else {
                 write();
             }
@@ -64,26 +64,25 @@ export const client = createClient({
 })
 
 export function Profile({ setIsConnected, setAddress }) {
-    const { address, isConnected } = useAccount({
-        onConnect({ address, connector, isReconnected }) {
-            setIsConnected(true);
+    const { address, isConnected } = useAccount()
+
+    useEffect(() => {
+        console.log(isConnected, address)
+        if (address) {
+            setIsConnected(isConnected);
             setAddress(address);
-        },
-        onDisconnect() {
-            setIsConnected(false);
-            setAddress("");
         }
-    })
+    }, [isConnected])
+
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     })
-    const { disconnect } = useDisconnect()
-
-    const { chain, chains } = useNetwork()
-
-    useEffect(() => {
-        console.log(chain);
-    }, [chain])
+    const { disconnect } = useDisconnect({
+        onSuccess(x){
+            setIsConnected(isConnected);
+            setAddress("");
+        }
+    })
 
     if (isConnected) {
         return (
