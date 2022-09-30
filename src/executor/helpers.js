@@ -1,5 +1,5 @@
-import {abiUniV2Pair, abiErc20} from "./abis";
-import {batchCall, formatFixed} from "../executor"
+import {abiUniV2Pair, abiErc20, abiUniV2Router} from "./abis";
+import {batchCall, formatFixed, initContract} from "../executor"
 
 export const getTokensByLp = async (lpAddr, lpAmount, provider) => {
     var calls = [
@@ -25,4 +25,10 @@ export const getTokensByLp = async (lpAddr, lpAmount, provider) => {
         formatFixed(token0Amount, token0Dec, 2),
         formatFixed(token1Amount, token1Dec, 2)
     ];
+}
+
+export const getTokenValue = async (amt, path, router, provider) => {
+    const routerContract = initContract(router, abiUniV2Router, provider);
+    let results = await routerContract.getAmountsOut(amt, path)
+    return results[results.length - 1];
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
-import { getTokensByLp } from "../executor/helpers"
-import { PrimaryButton, CommandBarButton } from "@fluentui/react";
+import { getTokensByLp, getTokenValue } from "../executor/helpers"
+import { PrimaryButton } from "@fluentui/react";
 import { usePrepareContractWrite, useContractWrite } from 'wagmi'
 
 const chefAbi = [
@@ -13,6 +13,9 @@ const chefAbi = [
 ]
 
 const chefAddress = "0xa5f8C5Dbd5F286960b9d90548680aE5ebFf07652";
+const cakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E"
+const Cake = "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82"
+const BUSD = "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
 
 const check = async (address) => {
     const provider = providerFromChain("bsc");
@@ -33,9 +36,11 @@ const check = async (address) => {
             continue;
         }
         let lpAddr = await contract.lpToken(i);
-        let pending = formatFixed(await contract.pendingCake(i, address), 18, 2);
+        let rawPending = await contract.pendingCake(i, address)
+        let pending = formatFixed(rawPending, 18, 2);
         let [, , , , token0Symbol, token1Symbol, token0Amount, token1Amount] = await getTokensByLp(lpAddr, amount, provider);
-        assets.push([token0Symbol, token0Amount, token1Symbol, token1Amount, pending, i]);
+        let pendingUSD = formatFixed(await getTokenValue(rawPending, [Cake, BUSD], cakeRouter, provider), 18, 2)
+        assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD]);
     }
     return assets;
 }
@@ -74,22 +79,22 @@ export function PancakeCard({ address }) {
         }
     }, [harvestPoolId])
 
-    return <div className="w-full bg-slate-200 text-sm font-mono p-2">
-        <div className="flex font-semibold mb-2">
+    return <div>
+        <div className="flex font-semibold mb-2 bg-slate-200 py-1">
             <div className="w-1/2">Assets</div>
             <div>Rewards</div>
         </div>
         {assets.map((asset) => {
-            return <div key={asset[5]}>
+            return <div key={asset[0]}>
                 <div className="flex items-center">
                     <div className="w-1/2">
-                        <div>{asset[0]} {asset[1]}</div>
-                        <div>{asset[2]} {asset[3]}</div>
+                        <div>{asset[1]} {asset[2]}</div>
+                        <div>{asset[3]} {asset[4]}</div>
                     </div>
                     <div className="flex items-center">
-                        <div>{asset[4]} Cake</div>
+                        <div>{asset[5]} Cake ({asset[6]}USD)</div>
                         <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
-                            onClick={() => { setHarvestPoolId(asset[5]) }}
+                            onClick={() => { setHarvestPoolId(asset[0]) }}
                         ></PrimaryButton>
                     </div>
                 </div>

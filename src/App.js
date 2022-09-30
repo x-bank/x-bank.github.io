@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { WagmiConfig } from "wagmi"
 import { client, Profile } from "./connectors"
 
+import { ProjectCard } from "./widgets/projectCard"
 import { BiswapCard } from "./projects/biswap";
 import { PancakeCard } from "./projects/pancake";
 
@@ -22,9 +23,13 @@ function App() {
             </div>
             {
               address.length > 0 ?
-                <div className='w-full flex flex-col space-y-4'>
-                  <BiswapCard address={address}></BiswapCard>
-                  <PancakeCard address={address}></PancakeCard>
+                <div className='w-full flex flex-col space-y-4 text-sm font-mono'>
+                  <ProjectCard name="Biswap" url="https://exchange.biswap.org/#/swap">
+                    <BiswapCard address={address}></BiswapCard>
+                  </ProjectCard>
+                  <ProjectCard name="Pancake" url="https://pancakeswap.finance/swap">
+                    <PancakeCard address={address}></PancakeCard>
+                  </ProjectCard>
                 </div>
                 : null
             }
