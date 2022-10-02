@@ -83,7 +83,7 @@ function View({ address, assets }) {
             <div className="w-1/2">Assets</div>
             <div>Rewards</div>
         </div>
-        <div style={{fontSize: "0.9em"}}>
+        <div style={{fontSize: "0.9em"}} className="flex flex-col space-y-4">
             {assets.map((asset) => {
                 return <div key={asset[0]}>
                     <div className="flex items-center">

@@ -65,6 +65,9 @@ export const client = createClient({
 
 export function Profile({ setIsConnected, setAddress }) {
     const { address, isConnected } = useAccount()
+    const { connect } = useConnect({
+        connector: new InjectedConnector(),
+    })
 
     useEffect(() => {
         console.log(isConnected, address)
@@ -74,13 +77,10 @@ export function Profile({ setIsConnected, setAddress }) {
         }
     }, [address, isConnected])
 
-    const { connect } = useConnect({
-        connector: new InjectedConnector(),
-    })
     const { disconnect } = useDisconnect({
-        onSuccess(x){
-            setIsConnected(isConnected);
-            setAddress("");
+        onSuccess(x) {
+            // setIsConnected(isConnected);
+            // setAddress("");
         }
     })
 
