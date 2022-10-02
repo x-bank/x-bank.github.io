@@ -29,8 +29,9 @@ const cakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E"
 const Alpaca = "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F"
 const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
+const provider = providerFromChain("bsc");
+
 const loadAsset = async (address) => {
-    const provider = providerFromChain("bsc");
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
     let calls = [];
@@ -84,6 +85,7 @@ function View({ address }) {
         let run = async () => {
             if (address) {
                 setIsLoading(true)
+                setAssets([])
                 setAssets(await loadAsset(address))
                 setIsLoading(false)
             }
@@ -99,18 +101,18 @@ function View({ address }) {
     })
 
     const renderLp = (asset) => {
-            return <>
-                <TableCell>
-                    <div>{asset[1]} {asset[2]}</div>
-                </TableCell>
-                <TableCell>
-                    <div className="flex items-center">
-                        <div>{asset[3]} Alpaca (${asset[4]})</div>
-                        <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
-                            onClick={() => { harvest([asset[0]]) }}
-                        ></PrimaryButton>
-                    </div>
-                </TableCell>
+        return <>
+            <TableCell>
+                <div>{asset[1]} {asset[2]}</div>
+            </TableCell>
+            <TableCell>
+                <div className="flex items-center">
+                    <div>{asset[3]} Alpaca (${asset[4]})</div>
+                    <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
+                        onClick={() => { harvest([asset[0]]) }}
+                    ></PrimaryButton>
+                </div>
+            </TableCell>
         </>
     }
 
@@ -131,9 +133,6 @@ function View({ address }) {
 }
 
 export default {
-    name: "Alpaca",
-    chainId: chainId,
     url: "https://app.alpacafinance.org/lend",
-    loadAsset,
     View,
 }    

@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
-import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
-import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { PrimaryButton } from "@fluentui/react";
-import { useCustomContractWrite } from "../connectors"
+import { initContract, providerFromChain, batchCall, formatFixed } from "../executor"
 import { abiErc20 } from "../executor/abis";
 
-import {Table} from "../widgets/table"
+import { Table } from "../widgets/table"
 
 const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 
@@ -28,7 +25,6 @@ const ctokenAbi = [
 const provider = providerFromChain("bsc");
 
 const listTokens = async () => {
-    const ctrlContract = initContract(ctrlAddress, ctrlAbi, provider);
     let [markets, oracle] = await batchCall([
         [ctrlAddress, ctrlAbi, "getAllMarkets", []],
         [ctrlAddress, ctrlAbi, "oracle", []],
@@ -61,7 +57,7 @@ const listTokens = async () => {
 
     let result = []
     for (var i = 0; i < prices.length; i++) {
-        result.push([names[i], markets[i], formatFixed(prices[i], 18), formatFixed(cashs[i], decs[i], 2)])
+        result.push([names[i], markets[i], formatFixed(prices[i], 18 + (18 - decs[i])), formatFixed(cashs[i], decs[i], 2), underlyings[i]])
     }
     let infos = [
         ['Controller:', ctrlAddress],
@@ -77,6 +73,8 @@ function View() {
 
     useEffect(() => {
         let run = async () => {
+            setTokens([])
+            setInfos([])
             setIsLoading(true)
             let [a, b] = await listTokens()
             setTokens(a)
@@ -89,7 +87,7 @@ function View() {
         <div className="w-7/12">
             <Table
                 title={"Assets"}
-                headers={["Name", "Address", "Price", "Liquidation"]}
+                headers={["Name", "Address", "Price", "Liquidation", "Underlying"]}
                 items={tokens}
                 loading={isLoading}
             ></Table>

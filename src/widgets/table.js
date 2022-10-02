@@ -63,7 +63,7 @@ function Table({ title, headers, items, itemRenderer, loading }) {
         </div>
     }
 
-    return <div>
+    return <div className="overflow-x-auto overflow-y-hidden">
         {renderTitle()}
         <table className="items-center w-full border-collapse text-blueGray-700">
             {renderHeader()}

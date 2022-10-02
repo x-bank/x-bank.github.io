@@ -20,17 +20,18 @@ const biswapRouter = "0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8"
 const BSW = "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1"
 const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
+const provider = providerFromChain("bsc");
+
 const loadAsset = async (address) => {
-    const provider = providerFromChain("bsc");
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
     let calls = [];
-    for (var i = 0; i < l; i++) {
+    for (let i = 0; i < l; i++) {
         calls.push([chefAddress, chefAbi, "userInfo", [i, address]]);
     }
     let results = await batchCall(calls, provider);
     let assets = [];
-    for (var i = 0; i < results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
         if (results[i] === null) {
             continue;
         }
@@ -48,7 +49,7 @@ const loadAsset = async (address) => {
     return assets;
 }
 
-function View({ address }) {
+const View = ({ address }) => {
     let [assets, setAssets] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
@@ -69,6 +70,7 @@ function View({ address }) {
         let run = async () => {
             if (address) {
                 setIsLoading(true)
+                setAssets([])
                 setAssets(await loadAsset(address))
                 setIsLoading(false)
             }
@@ -110,9 +112,6 @@ function View({ address }) {
 }
 
 export default {
-    name: "Biswap",
-    chainId: chainId,
     url: "https://exchange.biswap.org/#/swap",
-    loadAsset,
     View,
 }

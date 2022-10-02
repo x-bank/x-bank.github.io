@@ -4,7 +4,7 @@ import { formatFixed as _formatFixed, parseFixed as _parseFixed } from '@ethersp
 export const formatFixed = (val, _decimals, rounds = -1) => {
   let x = _formatFixed(val, _decimals);
   if (rounds > 0) {
-    return parseFloat(x).toFixed(rounds);
+    return parseFloat(parseFloat(x).toFixed(rounds));
   } else {
     return parseFloat(x);
   }
@@ -60,7 +60,7 @@ export const batchCall = async (calls, provider, aggrAddr="0xcA11bde05977b363116
   let rawResults = ethers.utils.defaultAbiCoder.decode(["tuple(bool, bytes)[]"], rawResultsHex)[0];
   let results = [];
   for (var i = 0; i < calls.length; i++) {
-    let [_address, _abiArray, _func, _params] = calls[i];
+    let [, _abiArray, _func, ] = calls[i];
     let _abi = new ethers.utils.Interface(_abiArray);
     let [_success, _rawResult] = rawResults[i];
     if (_success) {
