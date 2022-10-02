@@ -51,7 +51,7 @@ export const batchCall = async (calls, provider, aggrAddr="0xcA11bde05977b363116
   let requests = calls.map((call) => {
     let [_address, _abiArray, _func, _params] = call;
     let _abi = new ethers.utils.Interface(_abiArray);
-    return [_address, false, _abi.encodeFunctionData(_func, _params)];
+    return [_address, true, _abi.encodeFunctionData(_func, _params)];
   });
   let rawResultsHex = await provider.call({
     to: aggrAddr,
@@ -65,11 +65,15 @@ export const batchCall = async (calls, provider, aggrAddr="0xcA11bde05977b363116
     let [_success, _rawResult] = rawResults[i];
     if (_success) {
       let outputs = _abi.getFunction(_func).outputs;
-      let res = ethers.utils.defaultAbiCoder.decode(outputs, _rawResult);
-      if (outputs.length === 1) {
-        res = res[0];
+      try {
+        let res = ethers.utils.defaultAbiCoder.decode(outputs, _rawResult);
+        if (outputs.length === 1) {
+          res = res[0];
+        }
+        results.push(res);
+      } catch {
+        results.push(null);
       }
-      results.push(res);
     } else {
       results.push(null);
     }

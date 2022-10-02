@@ -4,7 +4,8 @@ import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from ".
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { PrimaryButton } from "@fluentui/react";
 import { useCustomContractWrite } from "../connectors"
-import { erc20ABI } from "wagmi";
+import { abiErc20 } from "../executor/abis";
+import { Table, TableCell } from "../widgets/table"
 
 const chainId = 56
 
@@ -59,8 +60,8 @@ const loadAsset = async (address) => {
         let tokenAmount = amount.mul(totalToken).div(totalSupply)
         let [tokenSymbol, underlyingDec] = await batchCall(
             [
-                [underlying, erc20ABI, "symbol", []],
-                [underlying, erc20ABI, "decimals", []],
+                [underlying, abiErc20, "symbol", []],
+                [underlying, abiErc20, "decimals", []],
             ],
             provider
         )
@@ -70,7 +71,26 @@ const loadAsset = async (address) => {
     return assets
 }
 
-function View({ address, assets }) {
+function View({ address }) {
+    let [assets, setAssets] = useState([])
+    let [isLoading, setIsLoading] = useState(false)
+
+    const coreInfos = [
+        ["Alpaca", Alpaca],
+        ["Chef", chefAddress],
+    ]
+
+    useEffect(() => {
+        let run = async () => {
+            if (address) {
+                setIsLoading(true)
+                setAssets(await loadAsset(address))
+                setIsLoading(false)
+            }
+        }
+        run();
+    }, [address])
+
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
@@ -78,27 +98,34 @@ function View({ address, assets }) {
         chainId: chainId,
     })
 
-    return <div>
-        <div className="flex font-semibold mb-2 bg-slate-200 py-1">
-            <div className="w-1/2">Assets</div>
-            <div>Rewards</div>
-        </div>
-        <div style={{fontSize: "0.9em"}} className="flex flex-col space-y-4">
-            {assets.map((asset) => {
-                return <div key={asset[0]}>
+    const renderLp = (asset) => {
+            return <>
+                <TableCell>
+                    <div>{asset[1]} {asset[2]}</div>
+                </TableCell>
+                <TableCell>
                     <div className="flex items-center">
-                        <div className="w-1/2">
-                            <div>{asset[1]} {asset[2]}</div>
-                        </div>
-                        <div className="flex items-center">
-                            <div>{asset[3]} Alpaca (${asset[4]})</div>
-                            <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
-                                onClick={() => { harvest([asset[0]]) }}
-                            ></PrimaryButton>
-                        </div>
+                        <div>{asset[3]} Alpaca (${asset[4]})</div>
+                        <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
+                            onClick={() => { harvest([asset[0]]) }}
+                        ></PrimaryButton>
                     </div>
-                </div>
-            })}
+                </TableCell>
+        </>
+    }
+
+    return <div className="flex justify-between">
+        <div className="w-7/12">
+            <Table
+                title={"Hold Assets"}
+                headers={["Balance", "Rewards"]}
+                itemRenderer={renderLp}
+                items={assets}
+                loading={isLoading}
+            ></Table>
+        </div>
+        <div className="w-4/12">
+            <Table title={"Core Infos"} items={coreInfos}></Table>
         </div>
     </div>
 }
@@ -109,4 +136,4 @@ export default {
     url: "https://app.alpacafinance.org/lend",
     loadAsset,
     View,
-}
+}    

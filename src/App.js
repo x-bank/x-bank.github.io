@@ -1,7 +1,7 @@
 import { useEffect, useState, createElement } from 'react'
 import { WagmiConfig } from "wagmi"
 import { client, Profile } from "./connectors"
-import { Routes, Route, Outlet, useParams } from "react-router-dom";
+import { Routes, Route, Outlet, useParams, Link } from "react-router-dom";
 
 import { useSnapshot } from 'valtio'
 
@@ -13,72 +13,45 @@ import { ProjectCard } from "./widgets/projectCard"
 import biswap from "./projects/biswap";
 import pancake from "./projects/pancake";
 import alpaca from "./projects/alpaca";
+import venus from "./projects/venus"
 
-import { assetStore, addressStore } from "./store"
+import { addressStore } from "./store"
 
-const projects = [pancake, biswap, alpaca]
+const projects = {
+  "56": {
+    "venus": venus,
+    "pancake": pancake,
+    "biswap": biswap,
+    "alpaca": alpaca,
+  }
+}
 
 function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  let assetStoreView = useSnapshot(assetStore);
-  let addressStoreView = useSnapshot(addressStore);
-
-  useEffect(() => {
-    let run = async (address) => {
-      if (!address) {
-        return;
-      }
-      const loadAssetCalls = projects.map((p) => p.loadAsset(address))
-      setIsLoading(true)
-      let results = await Promise.all(loadAssetCalls);
-      for (var i = 0; i < results.length; i++) {
-        let project = projects[i]
-        let key = project.chainId + "_" + project.name
-        assetStore[key] = results[i]
-      }
-      setIsLoading(false)
-    }
-    run(addressStoreView.address);
-  }, [addressStoreView.address])
-
-  const renderProjects = (address) => {
-    if (!address || address.length === 0) {
-      return null;
-    }
-
+  const renderSubProjects = (chainId, ps) => {
     let cards = []
-    for (let project of projects) {
-      let key = project.chainId + "_" + project.name
-      if (assetStoreView[key] && assetStoreView[key].length > 0) {
-        cards.push(
-          <ProjectCard name={project.name} url={project.url} key={key}>
-            {createElement(project.View, { address: address, assets: assetStoreView[key] })}
-          </ProjectCard>
-        )
-      }
-    }
-    if (cards.length === 0) {
-      cards.push(<div className='flex items-center justify-center'>
-        <div>No Project Found!</div>
+    for (const name in ps) {
+      cards.push(<div 
+        className='flex justify-center items-center w-full bg-slate-300 rounded-md p-10 uppercase text-base font-bold'
+      >
+        <Link to={"projects/" + chainId + "/" + name}>{name}</Link>
       </div>)
     }
+    return cards
+  }
 
-    return <div className='w-full flex flex-col space-y-4 text-sm font-mono'>
-      {cards}
+  const renderProjects = () => {
+    let items = []
+    for (const chainId in projects) {
+      items.push(<div className='grid grid-cols-6 gap-4'>
+        {renderSubProjects(chainId, projects[chainId])}
+      </div>)
+    }
+    return <div className='w-full'>
+      {items}
     </div>
   }
 
-  if (isLoading) {
-    return <div className='w-full flex items-center justify-center'>
-      <div className='mt-10'>
-        <Label>Fetching datas</Label>
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    </div>
-  } else {
-    return renderProjects(addressStoreView.address)
-  }
+  return <div>{renderProjects()}</div>
 }
 
 function Layout() {
@@ -98,9 +71,19 @@ function Layout() {
   );
 }
 
-function About() {
+function Project() {
   const params = useParams();
-  return <div>{params.chainId} {params.name}</div>
+  let addressStoreView = useSnapshot(addressStore);
+
+  if (!projects[params.chainId]) {
+    return <div>x</div>
+  }
+  if (!projects[params.chainId][params.name]) {
+    return <div>y</div>
+  }
+  return <div>
+    {createElement(projects[params.chainId][params.name].View, { address: addressStoreView.address })}
+  </div>
 }
 
 export default function App() {
@@ -111,9 +94,8 @@ export default function App() {
           <Route index element={<Home />} />
           <Route
             path="projects/:chainId/:name"
-            element={<About />}
+            element={<Project />}
           />
-
           <Route path="*" element={<Home />} />
         </Route>
       </Routes>
