@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { PrimaryButton, CommandBarButton } from "@fluentui/react";
-import {useCustomContractWrite} from "../connectors"
+import { useCustomContractWrite } from "../connectors"
+
+const chainId = 56
 
 const chefAbi = [
     "function userInfo(uint256, address) view returns (uint256, uint256)",
@@ -16,9 +18,8 @@ const chefAddress = "0xDbc1A13490deeF9c3C12b44FE77b503c1B061739"
 const biswapRouter = "0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8"
 const BSW = "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1"
 const USDT = "0x55d398326f99059fF775485246999027B3197955"
-const chainId = 56
 
-const check = async (address) => {
+const loadAsset = async (address) => {
     const provider = providerFromChain("bsc");
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
@@ -46,20 +47,7 @@ const check = async (address) => {
     return assets;
 }
 
-export function BiswapCard({ address }) {
-    let [assets, setAssets] = useState([]);
-    useEffect(() => {
-        if (address.length === "") {
-            return;
-        }
-        let run = async () => {
-            let val = await check(address);
-            console.log(val);
-            setAssets(val);
-        }
-        run();
-    }, [address])
-
+export function View({ address, assets }) {
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
@@ -73,22 +61,32 @@ export function BiswapCard({ address }) {
             <div>Rewards</div>
         </div>
         <div>
-            {assets.map((asset) => {
-                return <div key={asset[0]}>
-                    <div className="flex items-center">
-                        <div className="w-1/2">
-                            <div>{asset[1]} {asset[2]}</div>
-                            <div>{asset[3]} {asset[4]}</div>
-                        </div>
+            {
+                assets.map((asset) => {
+                    return <div key={asset[0]}>
                         <div className="flex items-center">
-                            <div>{asset[5]} BSW ({asset[6]}USD)</div>
-                            <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
-                                onClick={() => { harvest([asset[0], 0]) }}
-                            ></PrimaryButton>
+                            <div className="w-1/2">
+                                <div>{asset[1]} {asset[2]}</div>
+                                <div>{asset[3]} {asset[4]}</div>
+                            </div>
+                            <div className="flex items-center">
+                                <div>{asset[5]} BSW ({asset[6]}USD)</div>
+                                <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
+                                    onClick={() => { harvest([asset[0], 0]) }}
+                                ></PrimaryButton>
+                            </div>
                         </div>
                     </div>
-                </div>
-            })}
+                })
+            }
         </div>
     </div>
+}
+
+export default {
+    name: "Biswap",
+    chainId: chainId,
+    url: "https://exchange.biswap.org/#/swap",
+    loadAsset,
+    View,
 }

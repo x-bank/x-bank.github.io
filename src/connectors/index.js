@@ -47,7 +47,7 @@ export function useCustomContractWrite(params) {
         if (args !== null && chain.id) {
             if (chain.id !== params.chainId) {
                 switchNetwork(params.chainId)
-            } else {
+            } else if (write) {
                 write();
             }
         }
@@ -72,7 +72,7 @@ export function Profile({ setIsConnected, setAddress }) {
             setIsConnected(isConnected);
             setAddress(address);
         }
-    }, [isConnected])
+    }, [address, isConnected])
 
     const { connect } = useConnect({
         connector: new InjectedConnector(),
