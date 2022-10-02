@@ -15,8 +15,11 @@ import {
 import { useContext, useEffect, useState } from "react"
 
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { PrimaryButton } from '@fluentui/react/lib/Button';
 import { getDefaultProvider } from 'ethers'
+
+import { useSnapshot } from 'valtio'
+import { addressStore } from "../store"
 
 function shortAddr(addr) {
     return addr.substring(0, 6) + "..." + addr.substring(addr.length - 4);
@@ -63,7 +66,7 @@ export const client = createClient({
     provider: getDefaultProvider(),
 })
 
-export function Profile({ setIsConnected, setAddress }) {
+export function Profile() {
     const { address, isConnected } = useAccount()
     const { connect } = useConnect({
         connector: new InjectedConnector(),
@@ -72,17 +75,11 @@ export function Profile({ setIsConnected, setAddress }) {
     useEffect(() => {
         console.log(isConnected, address)
         if (address) {
-            setIsConnected(isConnected);
-            setAddress(address);
+            addressStore.address = address
         }
-    }, [address, isConnected])
+    }, [address])
 
-    const { disconnect } = useDisconnect({
-        onSuccess(x) {
-            // setIsConnected(isConnected);
-            // setAddress("");
-        }
-    })
+    const { disconnect } = useDisconnect()
 
     if (isConnected) {
         return (
