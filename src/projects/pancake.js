@@ -59,22 +59,24 @@ export function View({ address, assets }) {
             <div className="w-1/2">Assets</div>
             <div>Rewards</div>
         </div>
-        {assets.map((asset) => {
-            return <div key={asset[0]}>
-                <div className="flex items-center">
-                    <div className="w-1/2">
-                        <div>{asset[1]} {asset[2]}</div>
-                        <div>{asset[3]} {asset[4]}</div>
-                    </div>
+        <div style={{ fontSize: "0.9em" }}>
+            {assets.map((asset) => {
+                return <div key={asset[0]}>
                     <div className="flex items-center">
-                        <div>{asset[5]} Cake ({asset[6]}USD)</div>
-                        <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
-                            onClick={() => { harvest([asset[0], 0]) }}
-                        ></PrimaryButton>
+                        <div className="w-1/2">
+                            <div>{asset[1]} {asset[2]}</div>
+                            <div>{asset[3]} {asset[4]}</div>
+                        </div>
+                        <div className="flex items-center">
+                            <div>{asset[5]} Cake (${asset[6]})</div>
+                            <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
+                                onClick={() => { harvest([asset[0], 0]) }}
+                            ></PrimaryButton>
+                        </div>
                     </div>
                 </div>
-            </div>
-        })}
+            })}
+        </div>
     </div>
 }
 

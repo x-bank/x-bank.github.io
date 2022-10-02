@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { PrimaryButton, CommandBarButton } from "@fluentui/react";
+import { PrimaryButton } from "@fluentui/react";
 import { useCustomContractWrite } from "../connectors"
 
 const chainId = 56
@@ -60,7 +60,7 @@ export function View({ address, assets }) {
             <div className="w-1/2">Assets</div>
             <div>Rewards</div>
         </div>
-        <div>
+        <div style={{fontSize: "0.9em"}}>
             {
                 assets.map((asset) => {
                     return <div key={asset[0]}>
@@ -70,8 +70,8 @@ export function View({ address, assets }) {
                                 <div>{asset[3]} {asset[4]}</div>
                             </div>
                             <div className="flex items-center">
-                                <div>{asset[5]} BSW ({asset[6]}USD)</div>
-                                <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
+                                <div>{asset[5]} BSW (${asset[6]})</div>
+                                <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
                                     onClick={() => { harvest([asset[0], 0]) }}
                                 ></PrimaryButton>
                             </div>

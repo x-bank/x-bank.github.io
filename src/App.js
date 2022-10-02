@@ -1,6 +1,9 @@
 import { useEffect, useState, createElement } from 'react'
-import { chain, WagmiConfig } from "wagmi"
+import { WagmiConfig } from "wagmi"
 import { client, Profile } from "./connectors"
+
+import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
+import { Label } from '@fluentui/react/lib/Label';
 
 import { ProjectCard } from "./widgets/projectCard"
 
@@ -16,6 +19,7 @@ const projects = [pancake, biswap, alpaca]
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [address, setAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   let assetStoreView = useSnapshot(assetStore);
 
@@ -25,12 +29,14 @@ function App() {
     }
     let run = async () => {
       const loadAssetCalls = projects.map((p) => p.loadAsset(address))
+      setIsLoading(true)
       let results = await Promise.all(loadAssetCalls);
       for (var i = 0; i < results.length; i++) {
         let project = projects[i]
         let key = project.chainId + "_" + project.name
         assetStore[key] = results[i]
       }
+      setIsLoading(false)
     }
     run();
   }, [address])
@@ -51,6 +57,11 @@ function App() {
         )
       }
     }
+    if (cards.length === 0) {
+      cards.push(<div className='flex items-center justify-center'>
+        <div>No Project Found!</div>
+      </div>)
+    }
 
     return <div className='w-full flex flex-col space-y-4 text-sm font-mono'>
       {cards}
@@ -69,7 +80,12 @@ function App() {
               ></Profile>
             </div>
             {
-              renderProjects()
+              isLoading ? <div className='w-full flex items-center justify-center'>
+                <div className='mt-10'>
+                  <Label>Fetching datas</Label>
+                  <Spinner size={SpinnerSize.large} />
+                </div>
+              </div> : renderProjects()
             }
           </div>
         </div>

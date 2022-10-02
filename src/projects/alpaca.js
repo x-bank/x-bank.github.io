@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { PrimaryButton, CommandBarButton } from "@fluentui/react";
+import { PrimaryButton } from "@fluentui/react";
 import { useCustomContractWrite } from "../connectors"
 import { erc20ABI } from "wagmi";
 
@@ -57,7 +57,6 @@ const loadAsset = async (address) => {
             provider
         )
         let tokenAmount = amount.mul(totalToken).div(totalSupply)
-        let underlyingContract = initContract(underlying, erc20ABI, provider);
         let [tokenSymbol, underlyingDec] = await batchCall(
             [
                 [underlying, erc20ABI, "symbol", []],
@@ -67,7 +66,6 @@ const loadAsset = async (address) => {
         )
         let pendingUSD = formatFixed(await getTokenValue(rawPending, [Alpaca, USDT], cakeRouter, provider), 18, 2)
         assets.push([i, tokenSymbol, formatFixed(tokenAmount, underlyingDec, 2), formatFixed(rawPending, 18, 2), pendingUSD]);
-
     }
     return assets
 }
@@ -85,7 +83,7 @@ function View({ address, assets }) {
             <div className="w-1/2">Assets</div>
             <div>Rewards</div>
         </div>
-        <div>
+        <div style={{fontSize: "0.9em"}}>
             {assets.map((asset) => {
                 return <div key={asset[0]}>
                     <div className="flex items-center">
@@ -93,8 +91,8 @@ function View({ address, assets }) {
                             <div>{asset[1]} {asset[2]}</div>
                         </div>
                         <div className="flex items-center">
-                            <div>{asset[3]} Alpaca ({asset[4]}USD)</div>
-                            <PrimaryButton text="Harvest" primary className="ml-2 bg-sky-500"
+                            <div>{asset[3]} Alpaca (${asset[4]})</div>
+                            <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
                                 onClick={() => { harvest([asset[0]]) }}
                             ></PrimaryButton>
                         </div>
