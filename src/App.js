@@ -14,6 +14,7 @@ import biswap from "./projects/biswap";
 import pancake from "./projects/pancake";
 import alpaca from "./projects/alpaca";
 import venus from "./projects/venus"
+import curvefi from "./projects/curvefi"
 
 import { addressStore } from "./store"
 
@@ -23,6 +24,9 @@ const projects = {
     "pancake": pancake,
     "biswap": biswap,
     "alpaca": alpaca,
+  },
+  "1": {
+    "curve": curvefi
   }
 }
 
@@ -42,7 +46,7 @@ function Home() {
   const renderProjects = () => {
     let items = []
     for (const chainId in projects) {
-      items.push(<div className='grid grid-cols-6 gap-4'>
+      items.push(<div className='grid grid-cols-6 gap-4 mb-10'>
         {renderSubProjects(chainId, projects[chainId])}
       </div>)
     }

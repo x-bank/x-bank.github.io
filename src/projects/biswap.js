@@ -29,6 +29,12 @@ const loadAsset = async (address) => {
         [chefAddress, chefAbi, "poolLength", []],
         [chefAddress, chefAbi, "migrator", []],
     ], provider)
+    const coreInfos = [
+        ["BSW", BSW],
+        ["Router", biswapRouter],
+        ["Chef", chefAddress],
+        ["Migrator", migrator],
+    ]
     let calls = [];
     for (let i = 0; i < l.toNumber(); i++) {
         calls.push([chefAddress, chefAbi, "userInfo", [i, address]]);
@@ -50,12 +56,6 @@ const loadAsset = async (address) => {
         let pendingUSD = formatFixed(await getTokenValue(rawPending, [BSW, USDT], biswapRouter, provider), 18, 2)
         assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD]);
     }
-    const coreInfos = [
-        ["BSW", BSW],
-        ["Router", biswapRouter],
-        ["Chef", chefAddress],
-        ["Migrator", migrator],
-    ]
     return [assets, coreInfos]
 }
 
@@ -77,7 +77,7 @@ const View = ({ address }) => {
             if (address) {
                 setIsLoading(true)
                 setAssets([])
-                let [a, b] = await loadAsset(address)
+                let [a, b] = await loadAsset(address, setCoreInfos)
                 setAssets(a)
                 setCoreInfos(b)
                 setIsLoading(false)
@@ -114,7 +114,7 @@ const View = ({ address }) => {
             ></Table>
         </div>
         <div className="w-4/12">
-            <Table title={"Core Infos"} items={coreInfos}></Table>
+            <Table title={"Core Infos"} items={coreInfos} loading={isLoading}></Table>
         </div>
     </div>
 }
