@@ -12,7 +12,8 @@ const chefAbi = [
     "function poolLength() view returns (uint256)",
     "function pendingBSW(uint256, address) view returns (uint256)",
     "function poolInfo(uint256) view returns (address, uint256, uint256, uint256)",
-    "function deposit(uint256, uint256)"
+    "function deposit(uint256, uint256)",
+    "function migrator() view returns (address)"
 ]
 
 const chefAddress = "0xDbc1A13490deeF9c3C12b44FE77b503c1B061739"
@@ -24,9 +25,12 @@ const provider = providerFromChain("bsc");
 
 const loadAsset = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
-    const l = (await contract.poolLength()).toNumber();
+    let [l, migrator] = await batchCall([
+        [chefAddress, chefAbi, "poolLength", []],
+        [chefAddress, chefAbi, "migrator", []],
+    ], provider)
     let calls = [];
-    for (let i = 0; i < l; i++) {
+    for (let i = 0; i < l.toNumber(); i++) {
         calls.push([chefAddress, chefAbi, "userInfo", [i, address]]);
     }
     let results = await batchCall(calls, provider);
@@ -46,18 +50,20 @@ const loadAsset = async (address) => {
         let pendingUSD = formatFixed(await getTokenValue(rawPending, [BSW, USDT], biswapRouter, provider), 18, 2)
         assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD]);
     }
-    return assets;
+    const coreInfos = [
+        ["BSW", BSW],
+        ["Router", biswapRouter],
+        ["Chef", chefAddress],
+        ["Migrator", migrator],
+    ]
+    return [assets, coreInfos]
 }
 
 const View = ({ address }) => {
     let [assets, setAssets] = useState([])
+    let [coreInfos, setCoreInfos] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
-    const coreInfos = [
-        ["BSW", BSW],
-        ["Router", biswapRouter],
-        ["Chef", biswapRouter],
-    ]
 
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
@@ -71,7 +77,9 @@ const View = ({ address }) => {
             if (address) {
                 setIsLoading(true)
                 setAssets([])
-                setAssets(await loadAsset(address))
+                let [a, b] = await loadAsset(address)
+                setAssets(a)
+                setCoreInfos(b)
                 setIsLoading(false)
             }
         }
