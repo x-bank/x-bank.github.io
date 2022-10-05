@@ -75,7 +75,7 @@ function Table({ title, headers, items, itemRenderer, loading }) {
             renderEmptyLabel()
         }
         {
-            loading
+            (loading && items.length === 0)
                 ? <LargeSpinner></LargeSpinner>
                 : null
         }
