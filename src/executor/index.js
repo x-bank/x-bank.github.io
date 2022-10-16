@@ -12,8 +12,8 @@ export const formatFixed = (val, _decimals, rounds = -1) => {
 export const parseFixed = _parseFixed;
 
 const buildinChainUrl = {
-  "eth": "https://eth-mainnet.gateway.pokt.network/v1/5f3453978e354ab992c4da79",
-  "bsc": "https://bsc-dataseed.binance.org/",
+  "eth": "https://rpc.ankr.com/eth",
+  "bsc": "https://bsc-dataseed3.ninicoin.io",
   "polygon": "https://polygon-rpc.com/",
   "ftm": "https://rpc.ftm.tools/",
   "avax": "https://api.avax.network/ext/bc/C/rpc",
