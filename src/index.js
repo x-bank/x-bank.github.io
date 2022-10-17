@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import './index.css';
 import App from './App';
+import '@rainbow-me/rainbowkit/styles.css';
 
 
 import { initializeIcons } from '@fluentui/font-icons-mdl2';

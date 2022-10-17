@@ -1,28 +1,34 @@
 import {
-    WagmiConfig,
-    createClient,
-    defaultChains,
-    configureChains,
-    useAccount,
-    useConnect,
-    useDisconnect,
     useNetwork,
     usePrepareContractWrite,
     useContractWrite,
     useSwitchNetwork,
+    chain,
 } from 'wagmi'
 
 import { useContext, useEffect, useState } from "react"
 
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { PrimaryButton } from '@fluentui/react/lib/Button';
-import { getDefaultProvider } from 'ethers'
-
-import { useSnapshot } from 'valtio'
-import { addressStore } from "../store"
-
 function shortAddr(addr) {
     return addr.substring(0, 6) + "..." + addr.substring(addr.length - 4);
+}
+
+export const CHAIN_BSC = {
+    id: 56,
+    name: 'Binance',
+    network: 'bsc',
+    iconUrl: "https://bscscan.com/images/svg/brands/bnb.svg",
+    nativeCurrency: {
+        decimals: 18,
+        name: 'BNB',
+        symbol: 'BNB',
+    },
+    rpcUrls: {
+        default: 'https://bsc-dataseed3.ninicoin.io',
+    },
+    blockExplorers: {
+        default: { name: 'BSC', url: 'https://bscscan.com' },
+    },
+    testnet: false,
 }
 
 export function useCustomContractWrite(params) {
@@ -59,45 +65,4 @@ export function useCustomContractWrite(params) {
         }
     }, [args])
     return execute;
-}
-
-export const client = createClient({
-    autoConnect: true,
-    provider: getDefaultProvider(),
-})
-
-export function Profile() {
-    const { address, isConnected } = useAccount()
-    const { connect } = useConnect({
-        connector: new InjectedConnector(),
-    })
-
-    useEffect(() => {
-        console.log(isConnected, address)
-        if (address) {
-            addressStore.address = address
-        }
-    }, [address])
-
-    const { disconnect } = useDisconnect()
-
-    if (isConnected) {
-        return (
-            <div className='flex'>
-                <PrimaryButton className='bg-sky-500' onClick={disconnect} text={shortAddr(address)} checked={true}></PrimaryButton>
-            </div>
-        )
-    }
-
-    return (
-        <div>
-            <PrimaryButton
-                allowDisabledFocus
-                className='bg-sky-500'
-                onClick={() => connect()}
-            >
-                Connect
-            </PrimaryButton>
-        </div>
-    )
 }
