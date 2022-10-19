@@ -76,7 +76,6 @@ const View = ({ address }) => {
         let run = async () => {
             if (address) {
                 setIsLoading(true)
-                setAssets([])
                 let [a, b] = await loadAsset(address, setCoreInfos)
                 setAssets(a)
                 setCoreInfos(b)

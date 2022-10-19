@@ -69,7 +69,6 @@ export function View({ address }) {
         let run = async () => {
             if (address) {
                 setIsLoading(true)
-                setAssets([])
                 setAssets(await loadAsset(address))
                 setIsLoading(false)
             }

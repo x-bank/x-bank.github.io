@@ -29,7 +29,7 @@ function DataTable({ title, headers, items, itemRenderer, loading }) {
         if (!title || title.length === 0) {
             return null
         } else {
-            return <div className="flex justify-center items-center pb-1">
+            return <div className="flex justify-center items-center">
                 <div className="w-fit font-bold text-base">{title}</div>
             </div>
         }

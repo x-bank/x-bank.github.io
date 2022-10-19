@@ -45,20 +45,17 @@ export function useCustomContractWrite(params) {
     const { switchNetwork } = useSwitchNetwork({
         throwForSwitchChainNotSupported: true,
         onSettled(data, err) {
-            execute(null)
         }
     })
 
     useEffect(() => {
         if (args !== null && chain.id) {
             if (chain.id !== params.chainId) {
+                execute(null)
                 switchNetwork(params.chainId)
             } else if (write) {
                 write();
             }
-        }
-        return () => {
-            execute(null);
         }
     }, [args])
     return execute;

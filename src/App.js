@@ -90,14 +90,16 @@ function Layout() {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}
         theme={lightTheme({
-          accentColor: "#eee",
-          accentColorForeground: "#25292E"
+          accentColor: "#2185d0",
+          // accentColorForeground: "#25292E",
+          borderRadius: "medium",
+          fontStack: "system"
         })}>
         <div>
           <div>
             <div className='ml-auto mr-auto w-11/12 '>
               <div className='flex flex-row-reverse mb-6 mt-4'>
-                <ConnectButton />
+                <ConnectButton accountStatus="address"/>
               </div>
               <Outlet />
             </div>
