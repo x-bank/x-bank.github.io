@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { batchCall, formatFixed, providerFromChain } from "../executor"
 import { abiErc20 } from "../executor/abis"
-import { Table } from "../widgets/table"
+import { DataTable } from "../widgets/table"
 
 let coins = [
     "0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -56,22 +56,22 @@ const View = ({ address }) => {
     }, [])
     return <div className="flex flex-row justify-around">
         <div className="w-5/12">
-            <Table
+            <DataTable
                 title={"3pool"}
                 headers={["coin", "address", "balance"]}
                 items={pool3Assets}
                 loading={loading}
             >
-            </Table>
+            </DataTable>
         </div>
         <div className="w-5/12">
-            <Table
+            <DataTable
                 title={"stEth"}
                 headers={["coin", "address", "balance"]}
                 items={stEth}
                 loading={loading}
             >
-            </Table>
+            </DataTable>
         </div>
     </div>
 }

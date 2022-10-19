@@ -1,23 +1,23 @@
 import { LargeSpinner } from "./spinner"
-import { Label } from '@fluentui/react/lib/Label';
+import { Table } from 'semantic-ui-react'
 
 function TableCell(props) {
-    return <td className="border-t-1 px-3 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-1">{props.children}</td>
+    return <Table.Cell>{props.children}</Table.Cell>
 }
 
 function Header({ headers }) {
-    return <thead className="thead-light">
-        <tr>
+    return <Table.Header>
+        <Table.Row>
             {
                 headers.map((x) => {
-                    return <th className="px-3 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">{x}</th>
+                    return <Table.HeaderCell>{x}</Table.HeaderCell>
                 })
             }
-        </tr>
-    </thead>
+        </Table.Row>
+    </Table.Header>
 }
 
-function Table({ title, headers, items, itemRenderer, loading }) {
+function DataTable({ title, headers, items, itemRenderer, loading }) {
     const renderHeader = () => {
         if (!headers || headers.length === 0) {
             return null
@@ -29,7 +29,7 @@ function Table({ title, headers, items, itemRenderer, loading }) {
         if (!title || title.length === 0) {
             return null
         } else {
-            return <div className="flex justify-center items-center pb-2">
+            return <div className="flex justify-center items-center pb-1">
                 <div className="w-fit font-bold text-base">{title}</div>
             </div>
         }
@@ -37,53 +37,68 @@ function Table({ title, headers, items, itemRenderer, loading }) {
     const renderItems = () => {
         if (itemRenderer) {
             return items.map((item) => {
-                return <tr>
+                return <Table.Row>
                     {itemRenderer(item)}
-                </tr>
+                </Table.Row>
             })
         } else {
             return items.map((item) => {
-                return <tr>
+                return <Table.Row>
                     {item.map((x) => {
                         return <TableCell>{x}</TableCell>
                     })}
-                </tr>
+                </Table.Row>
             })
         }
     }
-    const renderEmptyLabel = () => {
-        if (loading) {
-            return null
+    const footerSpan = () => {
+        if (headers) {
+            return headers.length
         }
-        if (items && items.length > 0) {
-            return null
+        if (items) {
+            return items.length
         }
-        return <div className='w-full flex items-center justify-center'>
-            <Label disabled className="pt-2">Empty</Label>
-        </div>
+        return 1
+    }
+    const renderFooter = () => {
+        let inner = null;
+        if (loading && items.length === 0) {
+            inner = <LargeSpinner></LargeSpinner>
+        } else {
+            if (items && items.length > 0) {
+                return null
+            } else {
+                inner = <div className='w-full flex items-center justify-center'>
+                    <div className="pt-2 pb-2 text-slate-400">Empty</div>
+                </div>
+            }
+        }
+        if (inner !== null) {
+            return <Table.Footer>
+                <Table.Row>
+                    <Table.HeaderCell colSpan={footerSpan()}>
+                        {inner}
+                    </Table.HeaderCell>
+                </Table.Row>
+            </Table.Footer>
+        }
+
     }
 
     return <div className="overflow-x-auto overflow-y-hidden">
         {renderTitle()}
-        <table className="items-center w-full border-collapse text-blueGray-700">
+        <Table basic size='small'>
             {renderHeader()}
-            <tbody className="border-t-0 px-6 align-middle border-l-1 border-r-1 text-sm whitespace-nowrap p-4">
+            <Table.Body>
                 {renderItems()}
-            </tbody>
-        </table>
-        {
-            renderEmptyLabel()
-        }
-        {
-            (loading && items.length === 0)
-                ? <LargeSpinner></LargeSpinner>
-                : null
-        }
+            </Table.Body>
+            {renderFooter()}
+        </Table>
     </div>
 }
 
 export {
     TableCell,
     Header,
-    Table
+    DataTable,
 }

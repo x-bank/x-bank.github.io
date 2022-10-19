@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "https://x-bank.github.io",
   "dependencies": {
-    "@fluentui/react": "^8.59.0",
     "@rainbow-me/rainbowkit": "^0.7.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",

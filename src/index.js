@@ -9,9 +9,6 @@ import App from './App';
 import '@rainbow-me/rainbowkit/styles.css';
 
 
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
-initializeIcons();
-
 
 ReactDOM.render(
   <React.StrictMode>

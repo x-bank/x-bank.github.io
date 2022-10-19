@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { useCustomContractWrite } from "../connectors"
-import { Table, TableCell } from "../widgets/table"
+import { DataTable, TableCell } from "../widgets/table"
 import { Button } from 'semantic-ui-react'
 
 const chainId = 56
@@ -105,16 +105,16 @@ const View = ({ address }) => {
 
     return <div className="flex justify-between">
         <div className="w-7/12">
-            <Table
+            <DataTable
                 title={"Hold Lps"}
                 headers={["Balance", "Rewards"]}
                 items={assets}
                 itemRenderer={renderLp}
                 loading={isLoading}
-            ></Table>
+            ></DataTable>
         </div>
         <div className="w-4/12">
-            <Table title={"Core Infos"} items={coreInfos} loading={isLoading}></Table>
+            <DataTable title={"Core Infos"} items={coreInfos} loading={isLoading}></DataTable>
         </div>
     </div>
 }

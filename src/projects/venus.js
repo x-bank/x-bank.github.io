@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { providerFromChain, batchCall, formatFixed } from "../executor"
 import { abiErc20 } from "../executor/abis";
 
-import { Table } from "../widgets/table"
+import { DataTable } from "../widgets/table"
 
 const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 
@@ -85,20 +85,20 @@ function View() {
     }, [])
     return <div className="flex justify-between">
         <div className="w-7/12">
-            <Table
+            <DataTable
                 title={"Assets"}
                 headers={["Name", "Address", "Price", "Liquidation", "Underlying"]}
                 items={tokens}
                 loading={isLoading}
-            ></Table>
+            ></DataTable>
         </div>
         <div className="w-4/12">
-            <Table
+            <DataTable
                 title={"Core Infos"}
                 headers={["Name", "Address"]}
                 items={infos}
                 loading={isLoading}
-            ></Table>
+            ></DataTable>
         </div>
     </div>
 }
