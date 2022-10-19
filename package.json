@@ -1,8 +1,8 @@
 {
-  "name": "UliBank",
+  "name": "XBank",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://uli-bank.github.io",
+  "homepage": "https://x-bank.github.io",
   "dependencies": {
     "@fluentui/react": "^8.59.0",
     "@rainbow-me/rainbowkit": "^0.7.1",

@@ -51,7 +51,6 @@ export function useCustomContractWrite(params) {
     })
 
     useEffect(() => {
-        console.log(args);
         if (args !== null && chain.id) {
             if (chain.id !== params.chainId) {
                 switchNetwork(params.chainId)
