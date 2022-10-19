@@ -1,1 +1,0 @@
-(self.webpackChunkXBank=self.webpackChunkXBank||[]).push([[27],{2769:function(){},4654:function(){},6854:function(){},4616:function(){}}]);
