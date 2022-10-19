@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { PrimaryButton } from "@fluentui/react";
 import { useCustomContractWrite } from "../connectors"
 import { abiErc20 } from "../executor/abis";
 import { Table, TableCell } from "../widgets/table"
+import { Button } from 'semantic-ui-react'
 
 const chainId = 56
 
@@ -107,10 +107,10 @@ function View({ address }) {
             </TableCell>
             <TableCell>
                 <div className="flex items-center">
-                    <div>{asset[3]} Alpaca (${asset[4]})</div>
-                    <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
+                    <div className="mr-2">{asset[3]} Alpaca (${asset[4]})</div>
+                    <Button primary size="mini"
                         onClick={() => { harvest([asset[0]]) }}
-                    ></PrimaryButton>
+                    >Harvest</Button>
                 </div>
             </TableCell>
         </>

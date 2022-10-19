@@ -2,7 +2,7 @@ import { LargeSpinner } from "./spinner"
 import { Label } from '@fluentui/react/lib/Label';
 
 function TableCell(props) {
-    return <td className="border-t-1 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-1">{props.children}</td>
+    return <td className="border-t-1 px-3 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-1">{props.children}</td>
 }
 
 function Header({ headers }) {
@@ -10,7 +10,7 @@ function Header({ headers }) {
         <tr>
             {
                 headers.map((x) => {
-                    return <th className="px-3 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">{x}</th>
+                    return <th className="px-3 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">{x}</th>
                 })
             }
         </tr>

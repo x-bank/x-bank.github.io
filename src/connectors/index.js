@@ -3,10 +3,9 @@ import {
     usePrepareContractWrite,
     useContractWrite,
     useSwitchNetwork,
-    chain,
 } from 'wagmi'
 
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 function shortAddr(addr) {
     return addr.substring(0, 6) + "..." + addr.substring(addr.length - 4);

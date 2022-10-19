@@ -9,8 +9,6 @@ import alpaca from "./projects/alpaca";
 import venus from "./projects/venus"
 import curvefi from "./projects/curvefi"
 
-import { addressStore } from "./store"
-
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import {
@@ -64,7 +62,7 @@ function Home() {
     let cards = []
     for (const name in ps) {
       cards.push(<div
-        className='flex justify-center items-center w-full bg-slate-300 rounded-md p-10 uppercase text-base font-bold'
+        className='flex justify-center items-center w-full bg-slate-300 text-black rounded-md p-10 uppercase text-base font-bold'
       >
         <Link to={"projects/" + chainId + "/" + name}>{name}</Link>
       </div>)

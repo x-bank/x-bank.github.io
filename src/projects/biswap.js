@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
-import { PrimaryButton } from "@fluentui/react";
 import { useCustomContractWrite } from "../connectors"
 import { Table, TableCell } from "../widgets/table"
+import { Button } from 'semantic-ui-react'
 
 const chainId = 56
 
@@ -94,10 +94,10 @@ const View = ({ address }) => {
             </TableCell>
             <TableCell>
                 <div className="flex items-center">
-                    <div>{asset[5]} BSW (${asset[6]})</div>
-                    <PrimaryButton text="Harvest" className="ml-2 bg-sky-500"
+                    <div className="mr-2">{asset[5]} BSW (${asset[6]})</div>
+                    <Button size='mini' primary
                         onClick={() => { harvest([asset[0], 0]) }}
-                    ></PrimaryButton>
+                    >Harvest</Button>
                 </div>
             </TableCell>
         </>

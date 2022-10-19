@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { initContract, providerFromChain, batchCall, formatFixed } from "../executor"
+import { providerFromChain, batchCall, formatFixed } from "../executor"
 import { abiErc20 } from "../executor/abis";
 
 import { Table } from "../widgets/table"
