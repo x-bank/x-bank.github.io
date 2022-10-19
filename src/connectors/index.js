@@ -3,6 +3,7 @@ import {
     usePrepareContractWrite,
     useContractWrite,
     useSwitchNetwork,
+    useWaitForTransaction,
 } from 'wagmi'
 
 import { useEffect, useState } from "react"
@@ -23,6 +24,7 @@ export const CHAIN_BSC = {
     },
     rpcUrls: {
         default: 'https://bsc-dataseed3.ninicoin.io',
+        // default: 'http://127.0.0.1:8545',
     },
     blockExplorers: {
         default: { name: 'BSC', url: 'https://bscscan.com' },
@@ -30,23 +32,38 @@ export const CHAIN_BSC = {
     testnet: false,
 }
 
-export function useCustomContractWrite(params) {
-    let [args, execute] = useState(null);
+export function useCustomContractWrite(params, onConfirmed = undefined) {
+    let [args, execute] = useState(null)
+    let [confirmed, setConfirmed] = useState(false)
 
     const { config } = usePrepareContractWrite({
         ...params,
         args: args,
         enabled: args !== null
     })
-    const { write } = useContractWrite(config)
+    const { write, data: writeData } = useContractWrite({
+        ...config,
+        onSettled(data, error) {
+            execute(null)
+        },
+    })
 
     const { chain } = useNetwork()
 
     const { switchNetwork } = useSwitchNetwork({
         throwForSwitchChainNotSupported: true,
-        onSettled(data, err) {
-        }
     })
+
+    // const waitForTransaction = useWaitForTransaction({
+    //     wait: writeData?.wait,
+    //     confirmations: 1,
+    //     onSuccess: function (data) {
+    //         console.log(data)
+    //         if (onConfirmed) {
+    //             setConfirmed(true)
+    //         }
+    //     }
+    // })
 
     useEffect(() => {
         if (args !== null && chain.id) {
@@ -58,5 +75,16 @@ export function useCustomContractWrite(params) {
             }
         }
     }, [args])
+
+    useEffect(() => {
+        if (!confirmed) {
+            return
+        }
+        let runConfirmed = async () => {
+            await onConfirmed()
+        }
+        runConfirmed()
+    }, [confirmed])
+
     return execute;
 }
