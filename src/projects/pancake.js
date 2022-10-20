@@ -48,15 +48,21 @@ const loadAsset = async (address) => {
     return assets;
 }
 
-export function View({ address }) {
-    let [assets, setAssets] = useState([])
-    let [isLoading, setIsLoading] = useState(false)
-
+function hintView() {
     const coreInfos = [
         ["Cake", Cake],
         ["Router", cakeRouter],
         ["Chef", chefAddress],
     ]
+    return <div>
+        <DataTable items={coreInfos}></DataTable>
+    </div>
+}
+
+function View({ address }) {
+    let [assets, setAssets] = useState([])
+    let [isLoading, setIsLoading] = useState(false)
+
 
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
@@ -93,19 +99,13 @@ export function View({ address }) {
         </>
     }
 
-    return <div className="flex justify-between">
-        <div className="w-7/12">
-            <DataTable
-                title={"Hold Lps"}
-                headers={["Balance", "Rewards"]}
-                items={assets}
-                itemRenderer={renderLp}
-                loading={isLoading}
-            ></DataTable>
-        </div>
-        <div className="w-4/12">
-            <DataTable title={"Core Infos"} items={coreInfos}></DataTable>
-        </div>
+    return <div>
+        <DataTable
+            headers={["Balance", "Rewards"]}
+            items={assets}
+            itemRenderer={renderLp}
+            loading={isLoading}
+        ></DataTable>
     </div>
 }
 
