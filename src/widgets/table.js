@@ -21,7 +21,7 @@ function DataTable({ title, headers, items, itemRenderer, loading }) {
     const renderHeader = () => {
         if (!headers || headers.length === 0) {
             return null
-        } else if (!loading && items.length === 0) {
+        } else if (items.length === 0) {
             return null
         } else {
             return <Header headers={headers}></Header>
@@ -64,16 +64,12 @@ function DataTable({ title, headers, items, itemRenderer, loading }) {
     }
     const renderFooter = () => {
         let inner = null;
-        if (loading && items.length === 0) {
-            inner = <LargeSpinner></LargeSpinner>
+        if (items && items.length > 0) {
+            return null
         } else {
-            if (items && items.length > 0) {
-                return null
-            } else {
-                inner = <div className='w-full flex items-center justify-center'>
-                    <div className="pt-2 pb-2 text-slate-400 italic">Empty</div>
-                </div>
-            }
+            inner = <div className='w-full flex items-center justify-center'>
+                <div className="pt-2 pb-2 text-slate-400 italic">Empty</div>
+            </div>
         }
         if (inner !== null) {
             return <Table.Footer>

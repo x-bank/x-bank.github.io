@@ -38,7 +38,9 @@ const loadAsset = async (address) => {
         if (amount.eq(ZERO)) {
             continue;
         }
-        let lpAddr = await contract.lpToken(i);
+        let [lpAddr] = await batchCallWithCache([
+            [chefAddress, chefAbi, "lpToken", [i]]
+        ], provider) 
         let rawPending = await contract.pendingCake(i, address)
         let pending = formatFixed(rawPending, 18, 2);
         let [, , , , token0Symbol, token1Symbol, token0Amount, token1Amount] = await getTokensByLp(lpAddr, amount, provider);
@@ -59,7 +61,7 @@ function HintView() {
     </div>
 }
 
-function View({ address }) {
+function View({ address, refreshTicker }) {
     let [assets, setAssets] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
@@ -80,7 +82,7 @@ function View({ address }) {
             }
         }
         run();
-    }, [address])
+    }, [address, refreshTicker])
 
     const renderLp = (asset) => {
         return <>

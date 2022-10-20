@@ -1,6 +1,8 @@
 import { useEffect, useState, createElement } from 'react'
 import { Routes, Route, Outlet, useParams, Link } from "react-router-dom";
 
+import {useInterval} from 'react-use';
+
 import { CHAIN_BSC } from "./connectors"
 
 import biswap from "./projects/biswap";
@@ -67,6 +69,13 @@ const projects = [
 function Home() {
   const { address } = useAccount()
 
+  const [refreshTicker, setRefreshTicker] = useState(0)
+
+  useInterval(() => {
+    setRefreshTicker(refreshTicker + 1)
+  }, 30000)
+  
+
   const renderProjects = () => {
     let items = []
     for (const project of projects) {
@@ -76,7 +85,7 @@ function Home() {
           name={project.name}
           hintView={createElement(project.hintView)}
         >
-          {createElement(project.view, { address: address })}
+          {createElement(project.view, { address, refreshTicker })}
         </ProjectCard>
       )
     }
@@ -92,8 +101,8 @@ function Layout() {
   return <WagmiConfig client={wagmiClient}>
     <RainbowKitProvider chains={chains}
       theme={lightTheme({
-        accentColor: "#2185d0",
-        // accentColorForeground: "#25292E",
+        accentColor: "rgb(134 239 172)",
+        accentColorForeground: "black",
         borderRadius: "medium",
         fontStack: "system"
       })}>

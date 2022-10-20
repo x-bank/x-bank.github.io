@@ -70,7 +70,7 @@ const HintView = () => {
     return <DataTable items={coreInfos}></DataTable>
 }
 
-const View = ({ address }) => {
+const View = ({ address, refreshTicker }) => {
     let [assets, setAssets] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
@@ -92,7 +92,7 @@ const View = ({ address }) => {
             }
         }
         run();
-    }, [address])
+    }, [address, refreshTicker])
 
     const renderLp = (asset) => {
         return <>

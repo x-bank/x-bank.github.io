@@ -80,7 +80,7 @@ function HintView() {
     return <DataTable items={coreInfos}></DataTable>
 }
 
-function View({ address }) {
+function View({ address, refreshTicker }) {
     let [assets, setAssets] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
@@ -94,7 +94,7 @@ function View({ address }) {
             }
         }
         run();
-    }, [address])
+    }, [address, refreshTicker])
 
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
