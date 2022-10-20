@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
+import { initContract, providerFromChain, batchCall, ZERO, formatFixed, batchCallWithCache  } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { useCustomContractWrite } from "../connectors"
 import { DataTable, TableCell } from "../widgets/table"

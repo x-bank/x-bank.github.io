@@ -33,9 +33,8 @@ const loadMigrator = async () => {
 
 const loadAsset = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
-    let [l, migrator] = await batchCall([
+    let [l] = await batchCall([
         [chefAddress, chefAbi, "poolLength", []],
-        [chefAddress, chefAbi, "migrator", []],
     ], provider)
     let calls = [];
     for (let i = 0; i < l.toNumber(); i++) {

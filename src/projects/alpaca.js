@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { initContract, providerFromChain, batchCall, ZERO, formatFixed } from "../executor"
+import { initContract, providerFromChain, batchCall, ZERO, formatFixed, batchCallWithCache } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { useCustomContractWrite } from "../connectors"
 import { abiErc20 } from "../executor/abis";
@@ -59,7 +59,7 @@ const loadAsset = async (address) => {
             provider
         )
         let tokenAmount = amount.mul(totalToken).div(totalSupply)
-        let [tokenSymbol, underlyingDec] = await batchCall(
+        let [tokenSymbol, underlyingDec] = await batchCallWithCache(
             [
                 [underlying, abiErc20, "symbol", []],
                 [underlying, abiErc20, "decimals", []],
