@@ -10,7 +10,7 @@ function Header({ headers }) {
         <Table.Row>
             {
                 headers.map((x) => {
-                    return <Table.HeaderCell>{x}</Table.HeaderCell>
+                    return <Table.HeaderCell key={x}>{x}</Table.HeaderCell>
                 })
             }
         </Table.Row>
@@ -20,6 +20,8 @@ function Header({ headers }) {
 function DataTable({ title, headers, items, itemRenderer, loading }) {
     const renderHeader = () => {
         if (!headers || headers.length === 0) {
+            return null
+        } else if (!loading && items.length === 0) {
             return null
         } else {
             return <Header headers={headers}></Header>
@@ -69,7 +71,7 @@ function DataTable({ title, headers, items, itemRenderer, loading }) {
                 return null
             } else {
                 inner = <div className='w-full flex items-center justify-center'>
-                    <div className="pt-2 pb-2 text-slate-400">Empty</div>
+                    <div className="pt-2 pb-2 text-slate-400 italic">Empty</div>
                 </div>
             }
         }
@@ -87,7 +89,7 @@ function DataTable({ title, headers, items, itemRenderer, loading }) {
 
     return <div className="overflow-x-auto overflow-y-hidden">
         {renderTitle()}
-        <Table basic size='small'>
+        <Table  basic='very' size='small' columns={footerSpan()}>
             {renderHeader()}
             <Table.Body>
                 {renderItems()}

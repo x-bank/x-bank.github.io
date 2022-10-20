@@ -46,23 +46,22 @@ const wagmiClient = createClient({
 })
 
 
-const _projects = {
-  "56": {
-    "venus": venus,
-    "pancake": pancake,
-    "biswap": biswap,
-    "alpaca": alpaca,
-  },
-  "1": {
-    "curve": curvefi
-  }
-}
-
 const projects = [
   {
-    name: "Pancake",
-    view: pancake.View
-  }
+    name: "pancake",
+    view: pancake.View,
+    hintView: pancake.HintView,
+  },
+  {
+    name: "biswap",
+    view: biswap.View,
+    hintView: biswap.HintView,
+  },
+  {
+    name: "alpaca",
+    view: alpaca.View,
+    hintView: alpaca.HintView,
+  },
 ]
 
 function Home() {
@@ -73,7 +72,9 @@ function Home() {
     for (const project of projects) {
       items.push(
         <ProjectCard
+          key={project.name}
           name={project.name}
+          hintView={createElement(project.hintView)}
         >
           {createElement(project.view, { address: address })}
         </ProjectCard>
@@ -98,7 +99,7 @@ function Layout() {
       })}>
       <div>
         <div>
-          <div className='ml-auto mr-auto w-11/12 '>
+          <div className='mt-1 ml-auto mr-auto w-11/12 lg:w-9/12'>
             <div className='flex flex-row-reverse mb-6 mt-4'>
               <ConnectButton accountStatus="address" />
             </div>

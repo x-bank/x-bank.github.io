@@ -48,7 +48,7 @@ const loadAsset = async (address) => {
     return assets;
 }
 
-function hintView() {
+function HintView() {
     const coreInfos = [
         ["Cake", Cake],
         ["Router", cakeRouter],
@@ -99,17 +99,16 @@ function View({ address }) {
         </>
     }
 
-    return <div>
-        <DataTable
-            headers={["Balance", "Rewards"]}
-            items={assets}
-            itemRenderer={renderLp}
-            loading={isLoading}
-        ></DataTable>
-    </div>
+    return <DataTable
+        headers={["Balance", "Rewards"]}
+        items={assets}
+        itemRenderer={renderLp}
+        loading={isLoading}
+    ></DataTable>
 }
 
 export default {
     url: "https://pancakeswap.finance/swap",
     View,
+    HintView
 }

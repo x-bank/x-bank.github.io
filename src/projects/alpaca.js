@@ -72,14 +72,17 @@ const loadAsset = async (address) => {
     return assets
 }
 
-function View({ address }) {
-    let [assets, setAssets] = useState([])
-    let [isLoading, setIsLoading] = useState(false)
-
+function HintView() {
     const coreInfos = [
         ["Alpaca", Alpaca],
         ["Chef", chefAddress],
     ]
+    return <DataTable items={coreInfos}></DataTable>
+}
+
+function View({ address }) {
+    let [assets, setAssets] = useState([])
+    let [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         let run = async () => {
@@ -116,23 +119,18 @@ function View({ address }) {
         </>
     }
 
-    return <div className="flex justify-between">
-        <div className="w-7/12">
-            <DataTable
-                title={"Hold Assets"}
-                headers={["Balance", "Rewards"]}
-                itemRenderer={renderLp}
-                items={assets}
-                loading={isLoading}
-            ></DataTable>
-        </div>
-        <div className="w-4/12">
-            <DataTable title={"Core Infos"} items={coreInfos}></DataTable>
-        </div>
+    return <div>
+        <DataTable
+            headers={["Balance", "Rewards"]}
+            itemRenderer={renderLp}
+            items={assets}
+            loading={isLoading}
+        ></DataTable>
     </div>
 }
 
 export default {
     url: "https://app.alpacafinance.org/lend",
     View,
+    HintView,
 }    

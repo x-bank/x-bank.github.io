@@ -23,18 +23,20 @@ const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
 const provider = providerFromChain("bsc");
 
+const loadMigrator = async () => {
+    const contract = initContract(chefAddress, chefAbi, provider);
+    let [migrator] = await batchCall([
+        [chefAddress, chefAbi, "migrator", []],
+    ], provider)
+    return migrator
+}
+
 const loadAsset = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
     let [l, migrator] = await batchCall([
         [chefAddress, chefAbi, "poolLength", []],
         [chefAddress, chefAbi, "migrator", []],
     ], provider)
-    const coreInfos = [
-        ["BSW", BSW],
-        ["Router", biswapRouter],
-        ["Chef", chefAddress],
-        ["Migrator", migrator],
-    ]
     let calls = [];
     for (let i = 0; i < l.toNumber(); i++) {
         calls.push([chefAddress, chefAbi, "userInfo", [i, address]]);
@@ -56,12 +58,21 @@ const loadAsset = async (address) => {
         let pendingUSD = formatFixed(await getTokenValue(rawPending, [BSW, USDT], biswapRouter, provider), 18, 2)
         assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD]);
     }
-    return [assets, coreInfos]
+    return assets
+}
+
+const HintView = () => {
+    const coreInfos = [
+        ["BSW", BSW],
+        ["Router", biswapRouter],
+        ["Chef", chefAddress],
+    ]
+
+    return <DataTable items={coreInfos}></DataTable>
 }
 
 const View = ({ address }) => {
     let [assets, setAssets] = useState([])
-    let [coreInfos, setCoreInfos] = useState([])
     let [isLoading, setIsLoading] = useState(false)
 
 
@@ -76,9 +87,8 @@ const View = ({ address }) => {
         let run = async () => {
             if (address) {
                 setIsLoading(true)
-                let [a, b] = await loadAsset(address, setCoreInfos)
+                let a = await loadAsset(address)
                 setAssets(a)
-                setCoreInfos(b)
                 setIsLoading(false)
             }
         }
@@ -102,23 +112,16 @@ const View = ({ address }) => {
         </>
     }
 
-    return <div className="flex justify-between">
-        <div className="w-7/12">
-            <DataTable
-                title={"Hold Lps"}
-                headers={["Balance", "Rewards"]}
-                items={assets}
-                itemRenderer={renderLp}
-                loading={isLoading}
-            ></DataTable>
-        </div>
-        <div className="w-4/12">
-            <DataTable title={"Core Infos"} items={coreInfos} loading={isLoading}></DataTable>
-        </div>
-    </div>
+    return <DataTable
+        headers={["Balance", "Rewards"]}
+        items={assets}
+        itemRenderer={renderLp}
+        loading={isLoading}
+    ></DataTable>
 }
 
 export default {
     url: "https://exchange.biswap.org/#/swap",
     View,
+    HintView,
 }
