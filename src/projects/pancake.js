@@ -63,7 +63,6 @@ function HintView() {
 
 function View({ address, refreshTicker }) {
     let [assets, setAssets] = useState([])
-    let [isLoading, setIsLoading] = useState(false)
 
 
     let harvest = useCustomContractWrite({
@@ -76,9 +75,7 @@ function View({ address, refreshTicker }) {
     useEffect(() => {
         let run = async () => {
             if (address) {
-                setIsLoading(true)
                 setAssets(await loadAsset(address))
-                setIsLoading(false)
             }
         }
         run();
@@ -105,12 +102,10 @@ function View({ address, refreshTicker }) {
         headers={["Balance", "Rewards"]}
         items={assets}
         itemRenderer={renderLp}
-        loading={isLoading}
     ></DataTable>
 }
 
 export default {
-    url: "https://pancakeswap.finance/swap",
     View,
     HintView
 }

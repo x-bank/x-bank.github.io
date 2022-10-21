@@ -8,6 +8,7 @@ import { CHAIN_BSC } from "./connectors"
 import biswap from "./projects/biswap";
 import pancake from "./projects/pancake";
 import alpaca from "./projects/alpaca";
+import wombat from "./projects/wombat";
 import venus from "./projects/venus"
 import curvefi from "./projects/curvefi"
 
@@ -64,6 +65,11 @@ const projects = [
     view: alpaca.View,
     hintView: alpaca.HintView,
   },
+  {
+    name: "wombat",
+    view: wombat.View,
+    hintView: wombat.HintView,
+  },
 ]
 
 function Home() {
@@ -109,7 +115,7 @@ function Layout() {
       <div>
         <div>
           <div className='mt-1 ml-auto mr-auto w-11/12 lg:w-9/12'>
-            <div className='flex flex-row-reverse mb-6 mt-4'>
+            <div className='flex flex-row-reverse mb-6 mt-3'>
               <ConnectButton accountStatus="address" />
             </div>
             <Outlet />

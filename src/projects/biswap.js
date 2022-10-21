@@ -72,8 +72,6 @@ const HintView = () => {
 
 const View = ({ address, refreshTicker }) => {
     let [assets, setAssets] = useState([])
-    let [isLoading, setIsLoading] = useState(false)
-
 
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
@@ -85,10 +83,8 @@ const View = ({ address, refreshTicker }) => {
     useEffect(() => {
         let run = async () => {
             if (address) {
-                setIsLoading(true)
                 let a = await loadAsset(address)
                 setAssets(a)
-                setIsLoading(false)
             }
         }
         run();
@@ -115,12 +111,10 @@ const View = ({ address, refreshTicker }) => {
         headers={["Balance", "Rewards"]}
         items={assets}
         itemRenderer={renderLp}
-        loading={isLoading}
     ></DataTable>
 }
 
 export default {
-    url: "https://exchange.biswap.org/#/swap",
     View,
     HintView,
 }

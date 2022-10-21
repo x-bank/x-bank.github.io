@@ -1,7 +1,7 @@
 import { Popup } from 'semantic-ui-react'
 
 export function ProjectCard(props) {
-    return <div className="w-full bg-orange-50 pb-1 mb-6">
+    return <div className="w-full bg-orange-50 pb-1 mb-4">
         <Popup
             hoverable
             position='right center'
