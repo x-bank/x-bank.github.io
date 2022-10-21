@@ -31,7 +31,7 @@ const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
 const provider = providerFromChain("bsc");
 
-const loadAsset = async (address) => {
+const refreshState = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
     let calls = [];
@@ -80,18 +80,7 @@ function HintView() {
     return <DataTable items={coreInfos}></DataTable>
 }
 
-function View({ address, refreshTicker }) {
-    let [assets, setAssets] = useState([])
-
-    useEffect(() => {
-        let run = async () => {
-            if (address) {
-                setAssets(await loadAsset(address))
-            }
-        }
-        run();
-    }, [address, refreshTicker])
-
+function View({ state }) {
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
@@ -119,12 +108,15 @@ function View({ address, refreshTicker }) {
         <DataTable
             headers={["Balance", "Rewards"]}
             itemRenderer={renderLp}
-            items={assets}
+            items={state}
         ></DataTable>
     </div>
 }
 
 export default {
+    name: "alpaca",
+    chainId: chainId,
     View,
     HintView,
+    refreshState,
 }    

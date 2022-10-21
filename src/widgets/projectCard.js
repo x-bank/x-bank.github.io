@@ -1,4 +1,4 @@
-import { Popup } from 'semantic-ui-react'
+import { Popup, Loader } from 'semantic-ui-react'
 
 export function ProjectCard(props) {
     return <div className="w-full bg-orange-50 pb-1 mb-4">
@@ -6,9 +6,9 @@ export function ProjectCard(props) {
             hoverable
             position='right center'
             trigger={
-                <div className="bg-green-200 w-fit pl-2 pr-2 font-bold italic capitalize">
-                    {props.name}
-                </div>
+                    <div className="bg-green-200 w-fit pl-2 pr-2 font-bold italic capitalize mr-2">
+                        {props.name}
+                    </div>
             }
         >
             {

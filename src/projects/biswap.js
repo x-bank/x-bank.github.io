@@ -23,15 +23,8 @@ const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
 const provider = providerFromChain("bsc");
 
-const loadMigrator = async () => {
-    const contract = initContract(chefAddress, chefAbi, provider);
-    let [migrator] = await batchCall([
-        [chefAddress, chefAbi, "migrator", []],
-    ], provider)
-    return migrator
-}
 
-const loadAsset = async (address) => {
+const refreshState = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
     let [l] = await batchCall([
         [chefAddress, chefAbi, "poolLength", []],
@@ -70,25 +63,13 @@ const HintView = () => {
     return <DataTable items={coreInfos}></DataTable>
 }
 
-const View = ({ address, refreshTicker }) => {
-    let [assets, setAssets] = useState([])
-
+const View = ({ state }) => {
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
         functionName: "deposit",
         chainId: chainId,
     })
-
-    useEffect(() => {
-        let run = async () => {
-            if (address) {
-                let a = await loadAsset(address)
-                setAssets(a)
-            }
-        }
-        run();
-    }, [address, refreshTicker])
 
     const renderLp = (asset) => {
         return <>
@@ -109,12 +90,15 @@ const View = ({ address, refreshTicker }) => {
 
     return <DataTable
         headers={["Balance", "Rewards"]}
-        items={assets}
+        items={state}
         itemRenderer={renderLp}
     ></DataTable>
 }
 
 export default {
+    name: "biswap",
+    chainId: chainId,
     View,
     HintView,
+    refreshState,
 }

@@ -1,3 +1,7 @@
 import { proxy } from 'valtio'
 
-export const addressStore = proxy({address: undefined})
+const assetStore = proxy({})
+
+export {
+    assetStore,
+}

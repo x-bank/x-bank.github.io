@@ -33,16 +33,14 @@ const USDT = "0x55d398326f99059fF775485246999027B3197955"
 
 const provider = providerFromChain("bsc");
 
-const loadAsset = async (address) => {
+const refreshState = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
-    console.log("wom", l)
     let calls = [];
     for (var i = 0; i < l; i++) {
         calls.push([chefAddress, chefAbi, "userInfo", [i, address]]);
     }
     let results = await batchCall(calls, provider);
-    console.log(results)
     let assets = [];
     for (var i = 0; i < results.length; i++) {
         if (results[i] === null) {
@@ -84,18 +82,7 @@ function HintView() {
     return <DataTable items={coreInfos}></DataTable>
 }
 
-function View({ address, refreshTicker }) {
-    let [assets, setAssets] = useState([])
-
-    useEffect(() => {
-        let run = async () => {
-            if (address) {
-                setAssets(await loadAsset(address))
-            }
-        }
-        run();
-    }, [address, refreshTicker])
-
+function View({ state }) {
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
@@ -120,13 +107,13 @@ function View({ address, refreshTicker }) {
         <DataTable
             headers={["Balance", "Rewards"]}
             itemRenderer={renderLp}
-            items={assets}
+            items={state}
         ></DataTable>
         {
-            assets.length > 0 ?
+            state.length > 0 ?
                 <div className="flex justify-center items-center mb-2">
                     <Button primary size="mini"
-                        onClick={() => { harvest([assets.map((x) => x[0])]) }}
+                        onClick={() => { harvest([state.map((x) => x[0])]) }}
                     >Harvest All</Button>
                 </div>
                 : null
@@ -135,6 +122,9 @@ function View({ address, refreshTicker }) {
 }
 
 export default {
+    name: "wombat",
+    chainId: chainId,
     View,
     HintView,
+    refreshState,
 }    

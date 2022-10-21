@@ -1,7 +1,11 @@
 import { useEffect, useState, createElement } from 'react'
 import { Routes, Route, Outlet, useParams, Link } from "react-router-dom";
+import { useSnapshot } from 'valtio'
 
-import {useInterval} from 'react-use';
+import { Loader } from 'semantic-ui-react'
+
+import { useInterval } from 'react-use';
+import { assetStore } from "./store"
 
 import { CHAIN_BSC } from "./connectors"
 
@@ -50,52 +54,82 @@ const wagmiClient = createClient({
 
 
 const projects = [
-  {
-    name: "pancake",
-    view: pancake.View,
-    hintView: pancake.HintView,
-  },
-  {
-    name: "biswap",
-    view: biswap.View,
-    hintView: biswap.HintView,
-  },
-  {
-    name: "alpaca",
-    view: alpaca.View,
-    hintView: alpaca.HintView,
-  },
-  {
-    name: "wombat",
-    view: wombat.View,
-    hintView: wombat.HintView,
-  },
+  pancake,
+  biswap,
+  alpaca,
+  wombat,
 ]
+
+function _keyOfProject(p) {
+  return p.chainId + "|" + p.name
+}
 
 function Home() {
   const { address } = useAccount()
+  const snap = useSnapshot(assetStore)
 
   const [refreshTicker, setRefreshTicker] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
 
   useInterval(() => {
     setRefreshTicker(refreshTicker + 1)
   }, 30000)
-  
+
+  useEffect(() => {
+    let run = async () => {
+      if (address) {
+        await refreshAll(address)
+      }
+    }
+    run();
+  }, [refreshTicker])
+
+  const refreshAll = async (addr) => {
+    let promises = projects.map((p) => {
+      return p.refreshState(addr)
+    })
+    let results = await Promise.all(promises)
+    for (let i = 0; i < projects.length; i++) {
+      let key = _keyOfProject(projects[i])
+      assetStore[key] = results[i]
+    }
+  }
+
+  useEffect(() => {
+    let run = async () => {
+      if (address) {
+        for (let project of projects) {
+          let key = _keyOfProject(project)
+          assetStore[key] = undefined
+        }
+        setRefreshing(true)
+        await refreshAll(address)
+        setRefreshing(false)
+      }
+    }
+    run();
+  }, [address])
 
   const renderProjects = () => {
     let items = []
     for (const project of projects) {
-      items.push(
-        <ProjectCard
-          key={project.name}
-          name={project.name}
-          hintView={createElement(project.hintView)}
-        >
-          {createElement(project.view, { address, refreshTicker })}
-        </ProjectCard>
-      )
+      let key = _keyOfProject(project)
+      if (snap[key] && snap[key].length > 0) {
+        items.push(
+          <ProjectCard
+            key={key}
+            name={project.name}
+            hintView={createElement(project.HintView)}
+          >
+            {createElement(project.View, { address, state: snap[key] })}
+          </ProjectCard>
+        )
+      }
     }
     return <div className='w-full'>
+      <div className='flex flex-row-reverse mb-2 mr-1'>
+        <Loader active={refreshing} inline size='mini'></Loader>
+      </div>
       {items}
     </div>
   }

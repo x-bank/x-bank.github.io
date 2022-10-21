@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { initContract, providerFromChain, batchCall, ZERO, formatFixed, batchCallWithCache  } from "../executor"
+import { initContract, providerFromChain, batchCall, ZERO, formatFixed, batchCallWithCache } from "../executor"
 import { getTokensByLp, getTokenValue } from "../executor/helpers"
 import { useCustomContractWrite } from "../connectors"
 import { DataTable, TableCell } from "../widgets/table"
 import { Button } from 'semantic-ui-react'
+
+import { ProjectCard } from "../widgets/projectCard"
+import { assetStore, useAsset } from "../store";
 
 const chainId = 56
 const chefAbi = [
@@ -21,7 +24,7 @@ const BUSD = "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
 
 const provider = providerFromChain("bsc");
 
-const loadAsset = async (address) => {
+const refreshState = async (address) => {
     const contract = initContract(chefAddress, chefAbi, provider);
     const l = (await contract.poolLength()).toNumber();
     let calls = [];
@@ -40,7 +43,7 @@ const loadAsset = async (address) => {
         }
         let [lpAddr] = await batchCallWithCache([
             [chefAddress, chefAbi, "lpToken", [i]]
-        ], provider) 
+        ], provider)
         let rawPending = await contract.pendingCake(i, address)
         let pending = formatFixed(rawPending, 18, 2);
         let [, , , , token0Symbol, token1Symbol, token0Amount, token1Amount] = await getTokensByLp(lpAddr, amount, provider);
@@ -61,25 +64,13 @@ function HintView() {
     </div>
 }
 
-function View({ address, refreshTicker }) {
-    let [assets, setAssets] = useState([])
-
-
+function View({ address, state }) {
     let harvest = useCustomContractWrite({
         addressOrName: chefAddress,
         contractInterface: chefAbi,
         functionName: "deposit",
         chainId: chainId,
     })
-
-    useEffect(() => {
-        let run = async () => {
-            if (address) {
-                setAssets(await loadAsset(address))
-            }
-        }
-        run();
-    }, [address, refreshTicker])
 
     const renderLp = (asset) => {
         return <>
@@ -100,12 +91,16 @@ function View({ address, refreshTicker }) {
 
     return <DataTable
         headers={["Balance", "Rewards"]}
-        items={assets}
+        items={state}
         itemRenderer={renderLp}
     ></DataTable>
+
 }
 
 export default {
+    name: "pancake",
+    chainId: chainId,
     View,
-    HintView
+    HintView,
+    refreshState,
 }
