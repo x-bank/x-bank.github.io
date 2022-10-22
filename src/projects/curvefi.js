@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { batchCall, formatFixed, providerFromChain } from "../executor"
+import { batchCall, formatFixed, providerFromChain, batchCallWithCache } from "../executor"
 import { abiErc20 } from "../executor/abis"
 import { DataTable } from "../widgets/table"
 
@@ -31,17 +31,16 @@ const getStEthInfo = async () => {
 const View = ({ address }) => {
     let [pool3Assets, setPool3Assets] = useState([])
     let [stEth, setStEth] = useState([])
-    let [loading, setLoading] = useState(false)
     useEffect(() => {
         let run = async () => {
             setLoading(true)
             let bals = await batchCall(coins.map((coin) => {
                 return [coin, abiErc20, "balanceOf", [pool3Address]]
             }), provider)
-            let decs = await batchCall(coins.map((coin) => {
+            let decs = await batchCallWithCache(coins.map((coin) => {
                 return [coin, abiErc20, "decimals", []]
             }), provider)
-            let symbols = await batchCall(coins.map((coin) => {
+            let symbols = await batchCallWithCache(coins.map((coin) => {
                 return [coin, abiErc20, "symbol", []]
             }), provider)
             let result = []
@@ -55,24 +54,18 @@ const View = ({ address }) => {
         run()
     }, [])
     return <div className="flex flex-row justify-around">
-        <div className="w-5/12">
-            <DataTable
-                title={"3pool"}
-                headers={["coin", "address", "balance"]}
-                items={pool3Assets}
-                loading={loading}
-            >
-            </DataTable>
-        </div>
-        <div className="w-5/12">
-            <DataTable
-                title={"stEth"}
-                headers={["coin", "address", "balance"]}
-                items={stEth}
-                loading={loading}
-            >
-            </DataTable>
-        </div>
+        <DataTable
+            title={"3pool"}
+            headers={["coin", "address", "balance"]}
+            items={pool3Assets}
+        >
+        </DataTable>
+        <DataTable
+            title={"stEth"}
+            headers={["coin", "address", "balance"]}
+            items={stEth}
+        >
+        </DataTable>
     </div>
 }
 

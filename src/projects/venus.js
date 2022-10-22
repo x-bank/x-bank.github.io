@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { providerFromChain, batchCall, formatFixed } from "../executor"
+import { chainId } from "wagmi";
+import { providerFromChain, batchCall, formatFixed, batchCallWithCache } from "../executor"
 import { abiErc20 } from "../executor/abis";
 
 import { DataTable } from "../widgets/table"
@@ -24,8 +25,8 @@ const ctokenAbi = [
 
 const provider = providerFromChain("bsc");
 
-const listTokens = async () => {
-    let [markets, oracle] = await batchCall([
+const refreshState = async () => {
+    let [markets, oracle] = await batchCallWithCache([
         [ctrlAddress, ctrlAbi, "getAllMarkets", []],
         [ctrlAddress, ctrlAbi, "oracle", []],
     ], provider)
@@ -34,7 +35,7 @@ const listTokens = async () => {
     })
     let prices = await batchCall(priceCalls, provider)
 
-    let underlyings = await batchCall(markets.map((ctoken) => {
+    let underlyings = await batchCallWithCache(markets.map((ctoken) => {
         return [ctoken, ctokenAbi, "underlying", []]
     }), provider)
 
@@ -48,10 +49,10 @@ const listTokens = async () => {
         return [ctoken, ctokenAbi, "getCash", []]
     }), provider)
 
-    let decs = await batchCall(underlyings.map((token) => {
+    let decs = await batchCallWithCache(underlyings.map((token) => {
         return [token, abiErc20, "decimals", []]
     }), provider)
-    let names = await batchCall(underlyings.map((token) => {
+    let names = await batchCallWithCache(underlyings.map((token) => {
         return [token, abiErc20, "symbol", []]
     }), provider)
 
@@ -59,50 +60,23 @@ const listTokens = async () => {
     for (var i = 0; i < prices.length; i++) {
         result.push([names[i], markets[i], formatFixed(prices[i], 18 + (18 - decs[i])), formatFixed(cashs[i], decs[i], 2), underlyings[i]])
     }
-    let infos = [
-        ['Controller:', ctrlAddress],
-        ['Oracle:', oracle],
-    ]
-    return [result, infos]
+    return result
 }
 
-function View() {
-    let [isLoading, setIsLoading] = useState(false)
-    let [tokens, setTokens] = useState([])
-    let [infos, setInfos] = useState([])
 
-    useEffect(() => {
-        let run = async () => {
-            setTokens([])
-            setInfos([])
-            setIsLoading(true)
-            let [a, b] = await listTokens()
-            setTokens(a)
-            setInfos(b)
-            setIsLoading(false)
-        }
-        run()
-    }, [])
-    return <div className="flex justify-between">
-        <div className="w-7/12">
-            <DataTable
-                title={"Assets"}
-                headers={["Name", "Address", "Price", "Liquidation", "Underlying"]}
-                items={tokens}
-                loading={isLoading}
-            ></DataTable>
-        </div>
-        <div className="w-4/12">
-            <DataTable
-                title={"Core Infos"}
-                headers={["Name", "Address"]}
-                items={infos}
-                loading={isLoading}
-            ></DataTable>
-        </div>
+function View({ state }) {
+    return <div>
+        <DataTable
+            title={"Assets"}
+            headers={["Name", "Address", "Price", "Liquidation", "Underlying"]}
+            items={state}
+        ></DataTable>
     </div>
 }
 
 export default {
+    name: "venus",
+    chainId: chainId,
     View,
+    refreshState,
 }

@@ -39,18 +39,18 @@ const refreshState = async (address) => {
         }
         let amount = results[i][0];
         if (amount.eq(ZERO)) {
-            continue;
+            continue
         }
         let [lpAddr] = await batchCallWithCache([
             [chefAddress, chefAbi, "lpToken", [i]]
         ], provider)
         let rawPending = await contract.pendingCake(i, address)
         let pending = formatFixed(rawPending, 18, 2);
-        let [, , , , token0Symbol, token1Symbol, token0Amount, token1Amount] = await getTokensByLp(lpAddr, amount, provider);
+        let [, , , , token0Symbol, token1Symbol, token0Amount, token1Amount] = await getTokensByLp(lpAddr, amount, provider)
         let pendingUSD = formatFixed(await getTokenValue(rawPending, [Cake, BUSD], cakeRouter, provider), 18, 2)
-        assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD]);
+        assets.push([i, token0Symbol, token0Amount, token1Symbol, token1Amount, pending, pendingUSD])
     }
-    return assets;
+    return assets
 }
 
 function HintView() {
